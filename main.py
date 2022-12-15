@@ -19,9 +19,9 @@ TEXT_FONT_COLOR = "#F2DEDC"
 
 TK_WINDOW_TITLE = "Coffee Break"  # Set title of Tk Window
 
-SHORT_BREAK_TIME = 5  # Timer in minutes
-LONG_BREAK_TIME = 15  # Timer in minutes
-WORK_TIME = 25  # Timer in minutes
+SHORT_BREAK_TIME = .1  # Timer in minutes
+LONG_BREAK_TIME = .15  # Timer in minutes
+WORK_TIME = .2  # Timer in minutes
 BREAK_INTERVALS = 0  # This sets how many short breaks before a long break
 TIMER = None  # Need a variable to set the after_cancel method, or it won't work
 PAUSE = False
@@ -64,13 +64,22 @@ def start():
 		title_label.config(text="LONG\nBREAK")  # Adjust label
 		BREAK_INTERVALS = 0  # Revert Constant back to 0
 		startfile("15_break.mp4")  # Call a mp4 file of your choice
+		start_button.config(state="disabled")  # Disable the button so it can't be pushed again until reset.
 	elif BREAK_INTERVALS % 2 == 0:  # Every even period of the Constant break_intervals a break period will be called
 		count_down(short * 60)  # Call function
 		title_label.config(text="SHORT\nBREAK")  # Change title
 		startfile("5_break.mp4")  # Start mp4 file of your choice
+		start_button.config(state="disabled")  # Disable the button so it can't be pushed again until reset.
 	else:
-		count_down(work * 60)  # Call for every odd period of the work_interval
-		title_label.config(text="WORK")  # Change label
+		if BREAK_INTERVALS == 1:
+			count_down(work * 60)  # Call for every odd period of the work_interval
+			title_label.config(text="WORK")  # Change label
+			start_button.config(state="disabled")  # Disable the button so it can't be pushed again until reset.
+		else:
+			count_down(work * 60)  # Call for every odd period of the work_interval
+			title_label.config(text="WORK")  # Change label
+			startfile("back2work.mp4")  # Start mp4 file of your choice
+			start_button.config(state="disabled")  # Disable the button so it can't be pushed again until reset.
 
 
 def pause_resume():
@@ -86,17 +95,19 @@ def pause_resume():
 
 
 def reset():
-	global PAUSE, BREAK_INTERVALS, GLOBAL_TIME  # Bring Constant in to change it back to zero
+	global PAUSE, BREAK_INTERVALS, GLOBAL_TIME, START  # Bring Constant in to change it back to zero
 	if not PAUSE:
 		BREAK_INTERVALS = 0  # Reset the Constant
 		window.after_cancel(TIMER)  # Needs to be set to a Constant outside of the functions to stop the action
 		timer_label.config(text="")  # Reset the label
+		start_button.config(state="normal")  # Turn the button back to normal once it is reset
 	else:
 		window.after_cancel(TIMER)  # Needs to be set to a Constant outside of the functions to stop the action
 		GLOBAL_TIME = 0
 		BREAK_INTERVALS = 0  # Reset the Constant
 		timer_label.config(text="")  # Reset the label
 		pause_button.config(text="PAUSE")
+		start_button.config(state="normal")  # Turn the button back to normal once it is reset
 
 
 # --------------------------------------------Tk Window Box------------------------------------------------------------#
